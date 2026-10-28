@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinNova Rewards - Crypto Faucet & GPT Platform</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0B0F19',
+              card: '#111827',
+              accent: '#10B981',
+              gold: '#F59E0B',
+              darkBorder: '#1F2937'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- FontAwesome Icons & Inter Font -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0B0F19; }
+    ::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #10B981; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <!-- ==================== HEADER & NAVIGATION ==================== -->
+  <nav class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-cube text-slate-950 text-xl font-extrabold"></i>
+          </div>
+          <div>
+            <span class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent">CoinNova</span>
+            <span class="text-[10px] text-emerald-400 font-bold block -mt-1 tracking-widest uppercase">Rewards</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links (Desktop) -->
+        <div class="hidden md:flex items-center space-x-1">
+          <button onclick="switchTab('home')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-house mr-1.5 text-xs text-slate-400"></i>Home
+          </button>
+          <button onclick="switchTab('dashboard')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-chart-line mr-1.5 text-xs text-slate-400"></i>Dashboard
+          </button>
+          <button onclick="switchTab('faucet')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-faucet-drip mr-1.5 text-xs text-slate-400"></i>Faucet
+          </button>
+          <button onclick="switchTab('ptc')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-rectangle-ad mr-1.5 text-xs text-slate-400"></i>PTC Ads
+          </button>
+          <button onclick="switchTab('offerwalls')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-list-check mr-1.5 text-xs text-slate-400"></i>Offerwalls
+          </button>
+          <button onclick="switchTab('referrals')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold hover:text-emerald-400 hover:bg-slate-800/50 transition-all text-slate-300">
+            <i class="fa-solid fa-users mr-1.5 text-xs text-slate-400"></i>Referrals
+          </button>
+          <button onclick="switchTab('admin')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-bold text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all ml-2 border border-amber-500/20">
+            <i class="fa-solid fa-shield-halved mr-1.5"></i>Admin Panel
+          </button>
+        </div>
+
+        <!-- User Balance & Actions -->
+        <div class="flex items-center space-x-3">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-1.5 flex items-center space-x-2 shadow-inner">
+            <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+            <span id="user-balance" class="font-extrabold text-sm text-slate-100">0</span>
+            <span class="text-[10px] text-slate-400 uppercase font-semibold">Coins</span>
+          </div>
+          <button onclick="openWithdrawModal()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 flex items-center space-x-1.5">
+            <i class="fa-solid fa-wallet text-xs"></i>
+            <span>Withdraw</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== MAIN CONTAINER ==================== -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- HOME TAB -->
+    <div id="tab-home" class="tab-content space-y-12">
+      <!-- Hero Section -->
+      <div class="text-center space-y-6 py-12">
+        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+          <i class="fa-solid fa-bolt mr-1"></i> Instant FaucetPay Payouts
+        </span>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl mx-auto leading-tight">
+          Earn Crypto. Complete Tasks. <br><span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">Get Rewarded Instantly.</span>
+        </h1>
+        <p class="text-slate-400 text-lg max-w-2xl mx-auto font-normal">
+          Accumulate Coins by claiming from our high-yield Crypto Faucet, viewing PTC ads, and engaging with offerwalls. Cash out directly to FaucetPay with 0 fees.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 pt-2">
+          <button onclick="switchTab('faucet')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold px-8 py-4 rounded-xl shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all text-base flex items-center space-x-2">
+            <span>Start Earning Now</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+          <button onclick="switchTab('admin')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold px-8 py-4 rounded-xl transition-all text-base flex items-center space-x-2">
+            <i class="fa-solid fa-key text-amber-400 text-sm"></i>
+            <span>Configure API Key</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Platform Metrics -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl text-center space-y-1 shadow-md">
+          <div class="text-3xl font-black text-emerald-400">18,420+</div>
+          <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Active Users</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl text-center space-y-1 shadow-md">
+          <div class="text-3xl font-black text-teal-400">142,950+</div>
+          <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Claims</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl text-center space-y-1 shadow-md">
+          <div class="text-3xl font-black text-amber-400">$4,810.50</div>
+          <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Paid to Users</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl text-center space-y-1 shadow-md">
+          <div class="text-3xl font-black text-indigo-400">Instant</div>
+          <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">FaucetPay API</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content hidden space-y-8">
+      <div>
+        <h2 class="text-3xl font-black">User Overview</h2>
+        <p class="text-slate-400 text-sm">Track your balance, earnings history, and active payout status.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
+          <div class="text-4xl font-black text-emerald-400 flex items-center space-x-3">
+            <i class="fa-solid fa-coins text-amber-400 text-3xl"></i>
+            <span id="dash-balance">0</span>
+          </div>
+          <p class="text-xs text-slate-500">Value: ~$ <span id="dash-usd" class="text-slate-300 font-bold">0.00</span> USD</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lifetime Activity</span>
+          <div class="text-4xl font-black text-slate-100" id="dash-claims">0</div>
+          <p class="text-xs text-slate-500">Total Faucet Claims & Ads Completed</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">FaucetPay Connection</span>
+          <div class="text-lg font-extrabold flex items-center space-x-2 pt-1" id="dash-api-status">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span class="text-emerald-400">Merchant API Configured</span>
+          </div>
+          <p class="text-xs text-slate-500">Automatic backend processing active</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAUCET TAB -->
+    <div id="tab-faucet" class="tab-content hidden max-w-xl mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center space-y-6 shadow-2xl">
+        <div class="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-inner">
+          <i class="fa-solid fa-faucet-drip"></i>
+        </div>
+        <div>
+          <h2 class="text-3xl font-black">Crypto Faucet</h2>
+          <p class="text-slate-400 text-sm mt-1">Claim 50 free Coins every 5 minutes!</p>
+        </div>
+        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 shadow-inner">
+          <span class="text-xs text-slate-500 font-semibold uppercase tracking-widest block mb-1">Cooldown Timer</span>
+          <span id="faucet-timer" class="text-3xl font-mono font-black text-emerald-400">READY TO CLAIM</span>
+        </div>
+        <button id="claim-btn" onclick="claimFaucet()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-98 text-slate-950 font-black py-4 rounded-xl transition-all shadow-xl shadow-emerald-500/20 text-lg uppercase tracking-wider">
+          Claim 50 Free Coins
+        </button>
+      </div>
+    </div>
+
+    <!-- PTC TAB -->
+    <div id="tab-ptc" class="tab-content hidden space-y-6">
+      <div>
+        <h2 class="text-3xl font-black">Paid-To-Click Ads</h2>
+        <p class="text-slate-400 text-sm">Watch short sponsor advertisements to earn extra coins.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="ptc-ads-container">
+        <!-- Dynamic PTC ads -->
+      </div>
+    </div>
+
+    <!-- OFFERWALLS TAB -->
+    <div id="tab-offerwalls" class="tab-content hidden space-y-6">
+      <div>
+        <h2 class="text-3xl font-black">Offerwalls & Surveys</h2>
+        <p class="text-slate-400 text-sm">Complete high-paying surveys, tasks, and app downloads.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 hover:border-emerald-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-bold text-slate-100">CPX Research</span>
+            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2.5 py-1 rounded-md">SURVEYS</span>
+          </div>
+          <p class="text-xs text-slate-400">Highest paying daily surveys with instant coin rewards.</p>
+          <button onclick="showToast('Opening CPX Research Offerwall...')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition-all">Start Tasks</button>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 hover:border-emerald-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-bold text-slate-100">Monlix</span>
+            <span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 text-[10px] font-bold px-2.5 py-1 rounded-md">OFFERS</span>
+          </div>
+          <p class="text-xs text-slate-400">Download games and complete mobile app offers.</p>
+          <button onclick="showToast('Opening Monlix Offerwall...')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition-all">Start Tasks</button>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 hover:border-emerald-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-bold text-slate-100">TimeWall</span>
+            <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2.5 py-1 rounded-md">MICRO TASKS</span>
+          </div>
+          <p class="text-xs text-slate-400">Quick social media clicks, votes, and registrations.</p>
+          <button onclick="showToast('Opening TimeWall Offerwall...')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition-all">Start Tasks</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERRALS TAB -->
+    <div id="tab-referrals" class="tab-content hidden space-y-6">
+      <div>
+        <h2 class="text-3xl font-black">Referral Program</h2>
+        <p class="text-slate-400 text-sm">Invite your friends and earn 20% commission on all their faucet claims forever!</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Your Personal Referral Link</label>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="ref-link" value="https://coinnova-rewards.com/?ref=ads14789" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none">
+          <button onclick="copyRefLink()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition-all flex-shrink-0">
+            <i class="fa-solid fa-copy mr-1"></i> Copy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL TAB -->
+    <div id="tab-admin" class="tab-content hidden space-y-8">
+      <div>
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl">
+            <i class="fa-solid fa-shield-halved text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="text-3xl font-black text-slate-100">FaucetPay API & Admin Control Panel</h2>
+            <p class="text-slate-400 text-sm">Configure secret credentials and manage automatic payouts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FaucetPay Settings Card -->
+      <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-6 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-key text-emerald-400 text-xl"></i>
+            <div>
+              <h3 class="font-bold text-lg text-slate-100">FaucetPay Merchant API Key Settings</h3>
+              <p class="text-xs text-slate-400">Retrieved directly from your FaucetPay Faucet Owner Admin Dashboard.</p>
+            </div>
+          </div>
+          <span class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+            LocalStorage Active
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">FaucetPay API Key (Secret)</label>
+            <input type="text" id="cfg-api-key" placeholder="e.g. 48192a83f9104b..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 font-mono text-emerald-400">
+            <p class="text-[11px] text-slate-500 mt-1.5">Paste the key copied from FaucetPay -> Faucet Owner Admin.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Merchant Username / Faucet Name</label>
+            <input type="text" id="cfg-merchant-name" placeholder="e.g. Coinova" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 text-slate-100">
+            <p class="text-[11px] text-slate-500 mt-1.5">The exact name registered in FaucetPay.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800/80">
+          <div class="flex items-center space-x-2 text-xs text-emerald-400">
+            <i class="fa-solid fa-lock"></i>
+            <span>Credentials persist securely across browser refreshes.</span>
+          </div>
+          <button onclick="saveApiSettings()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-extrabold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-sm">
+            Save API Keys Permanently
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== WITHDRAWAL MODAL ==================== -->
+  <div id="withdraw-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-wallet text-emerald-400 text-lg"></i>
+          <h3 class="text-xl font-bold">Instant Withdrawal</h3>
+        </div>
+        <button onclick="closeWithdrawModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">FaucetPay Email / Wallet Address</label>
+          <input type="email" id="wit-address" placeholder="user@faucetpay.io" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Amount in Coins</label>
+          <input type="number" id="wit-amount" placeholder="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
+        </div>
+        <button onclick="processWithdrawal()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+          Execute FaucetPay Payout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NOTIFICATION TOAST ==================== -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-emerald-500/50 text-slate-100 px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-24 opacity-0 z-50">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+    <span id="toast-msg" class="text-sm font-semibold">Settings saved successfully!</span>
+  </div>
+
+  <!-- ==================== LOGIC & SCRIPT ==================== -->
+  <script>
+    // State management backed by LocalStorage
+    let state = {
+      balance: parseInt(localStorage.getItem('cn_balance')) || 250,
+      claims: parseInt(localStorage.getItem('cn_claims')) || 5,
+      apiKey: localStorage.getItem('faucetpay_api_key') || '',
+      merchantName: localStorage.getItem('faucetpay_merchant_name') || ''
+    };
+
+    // Initialize application on startup
+    window.addEventListener('DOMContentLoaded', () => {
+      updateUI();
+      loadApiInputs();
+      renderPtcAds();
+    });
+
+    // Navigation Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    }
+
+    // Refresh UI Counters & Statuses
+    function updateUI() {
+      document.getElementById('user-balance').innerText = state.balance;
+      document.getElementById('dash-balance').innerText = state.balance;
+      document.getElementById('dash-usd').innerText = (state.balance * 0.0001).toFixed(4);
+      document.getElementById('dash-claims').innerText = state.claims;
+
+      const apiStatusEl = document.getElementById('dash-api-status');
+      if (state.apiKey) {
+        apiStatusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span class="text-emerald-400">Merchant API Active</span>`;
+      } else {
+        apiStatusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400"></i><span class="text-amber-400">API Key Missing</span>`;
+      }
+    }
+
+    // Load saved API settings into Admin inputs
+    function loadApiInputs() {
+      if (state.apiKey) {
+        document.getElementById('cfg-api-key').value = state.apiKey;
+      }
+      if (state.merchantName) {
+        document.getElementById('cfg-merchant-name').value = state.merchantName;
+      }
+    }
+
+    // Save API Settings permanently into LocalStorage
+    function saveApiSettings() {
+      const keyInput = document.getElementById('cfg-api-key').value.trim();
+      const merchantInput = document.getElementById('cfg-merchant-name').value.trim();
+
+      if (!keyInput) {
+        showToast("Please enter a valid FaucetPay API Key!", true);
+        return;
+      }
+
+      // Permanent LocalStorage Save
+      localStorage.setItem('faucetpay_api_key', keyInput);
+      localStorage.setItem('faucetpay_merchant_name', merchantInput);
+
+      // Update active runtime state
+      state.apiKey = keyInput;
+      state.merchantName = merchantInput;
+
+      updateUI();
+      showToast("API Key saved permanently!");
+    }
+
+    // Crypto Faucet Claim
+    function claimFaucet() {
+      state.balance += 50;
+      state.claims += 1;
+      localStorage.setItem('cn_balance', state.balance);
+      localStorage.setItem('cn_claims', state.claims);
+      updateUI();
+      showToast("Claimed 50 Coins successfully!");
+    }
+
+    // Render PTC Ads
+    function renderPtcAds() {
+      const container = document.getElementById('ptc-ads-container');
+      const ads = [
+        { id: 1, title: 'Crypto Exchange Special Bonus', reward: 40, duration: 15 },
+        { id: 2, title: 'High Yield Crypto Staking Pool', reward: 25, duration: 10 },
+        { id: 3, title: 'Best Web3 Wallet 2026', reward: 20, duration: 8 }
+      ];
+      container.innerHTML = ads.map(ad => `
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+          <div>
+            <h4 class="font-bold text-slate-100">${ad.title}</h4>
+            <span class="text-xs text-slate-400">${ad.duration}s view duration • +${ad.reward} Coins</span>
+          </div>
+          <button onclick="viewAd(${ad.reward})" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold transition-all">View Ad</button>
+        </div>
+      `).join('');
+    }
+
+    function viewAd(reward) {
+      state.balance += reward;
+      localStorage.setItem('cn_balance', state.balance);
+      updateUI();
+      showToast(`Ad completed! Received ${reward} Coins.`);
+    }
+
+    // Copy Referral Link
+    function copyRefLink() {
+      const input = document.getElementById('ref-link');
+      input.select();
+      document.execCommand('copy');
+      showToast("Referral link copied to clipboard!");
+    }
+
+    // Withdrawal Modals
+    function openWithdrawModal() {
+      document.getElementById('withdraw-modal').classList.remove('hidden');
+      document.getElementById('withdraw-modal').classList.add('flex');
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdraw-modal').classList.add('hidden');
+      document.getElementById('withdraw-modal').classList.remove('flex');
+    }
+
+    function processWithdrawal() {
+      const amount = parseInt(document.getElementById('wit-amount').value);
+      if (!amount || amount > state.balance) {
+        showToast("Invalid withdrawal amount!", true);
+        return;
+      }
+
+      if (!state.apiKey) {
+        showToast("Configure FaucetPay API Key in Admin Panel first!", true);
+        return;
+      }
+
+      state.balance -= amount;
+      localStorage.setItem('cn_balance', state.balance);
+      updateUI();
+      closeWithdrawModal();
+      showToast(`Withdrawal of ${amount} Coins executed via FaucetPay!`);
+    }
+
+    // Toast Notification System
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      if (isError) {
+        toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400 text-xl";
+        toast.className = toast.className.replace('border-emerald-500/50', 'border-rose-500/50');
+      } else {
+        toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-xl";
+        toast.className = toast.className.replace('border-rose-500/50', 'border-emerald-500/50');
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
